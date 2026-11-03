@@ -1,0 +1,7 @@
+# Dashboard de A (datos del propio usuario)
+# 2026-11-03T00:11:42Z · crAPI · token oculto
+
+> GET /identity/api/v2/user/dashboard
+> Authorization: Bearer eyJhbG…[OCULTO]
+< HTTP 200
+{"id":8,"name":"Usuario a","email":"usuarioa@lab.local","number":"900000a11","picture_url":null,"video_url":null,"video_name":null,"available_credit":100.0,"video_id":0,"role":"ROLE_USER"}

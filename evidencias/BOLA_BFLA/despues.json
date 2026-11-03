@@ -1,0 +1,164 @@
+{
+  "titulo": "BOLA, BFLA y propiedades",
+  "etapa": "despues",
+  "fecha": "2026-11-02T23:53:41+00:00",
+  "casos": [
+    {
+      "caso": "A pide su pedido 1",
+      "metodo": "GET",
+      "url": "/api/orders/1",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": null,
+      "esperado": "200",
+      "status": 200,
+      "retry_after": null,
+      "respuesta": {
+        "id": 1,
+        "status": "pagado",
+        "shipping_address": "Calle Ficticia 123, Ciudad Lab",
+        "items": [
+          {
+            "product_id": "P-100",
+            "name": "Filtro de aceite",
+            "quantity": 2,
+            "unit_price": 12.5
+          },
+          {
+            "product_id": "P-400",
+            "name": "Limpiaparabrisas",
+            "quantity": 1,
+            "unit_price": 9.9
+          }
+        ],
+        "total": 34.9,
+        "created_at": "2026-11-02T23:53:35+00:00"
+      }
+    },
+    {
+      "caso": "A pide el pedido 3, que es de B",
+      "metodo": "GET",
+      "url": "/api/orders/3",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": null,
+      "esperado": "404",
+      "status": 404,
+      "retry_after": null,
+      "respuesta": {
+        "detail": "pedido no encontrado"
+      }
+    },
+    {
+      "caso": "admin pide la auditoria",
+      "metodo": "GET",
+      "url": "/api/admin/audit",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": null,
+      "esperado": "200",
+      "status": 200,
+      "retry_after": null,
+      "respuesta": [
+        {
+          "ts": "2026-11-02T23:53:41+00:00",
+          "actor": "a1a1a1a1-0000-4000-8000-00000000000a",
+          "action": "bola_denegado",
+          "detail": "pedido 3"
+        }
+      ]
+    },
+    {
+      "caso": "usuarioa pide la auditoria",
+      "metodo": "GET",
+      "url": "/api/admin/audit",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": null,
+      "esperado": "403",
+      "status": 403,
+      "retry_after": null,
+      "respuesta": {
+        "detail": "se requiere el rol admin"
+      }
+    },
+    {
+      "caso": "A pide su perfil",
+      "metodo": "GET",
+      "url": "/api/profile",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": null,
+      "esperado": "200 solo con username, full_name, email y address",
+      "status": 200,
+      "retry_after": null,
+      "respuesta": {
+        "username": "usuarioa",
+        "full_name": "Usuario A",
+        "email": "usuarioa@lab.local",
+        "address": "Calle Ficticia 123, Ciudad Lab"
+      }
+    },
+    {
+      "caso": "A intenta ponerse role=admin con PATCH",
+      "metodo": "PATCH",
+      "url": "/api/profile",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": {
+        "address": "Calle Escalada 1, Ciudad Lab",
+        "role": "admin",
+        "is_admin": true
+      },
+      "esperado": "422",
+      "status": 422,
+      "retry_after": null,
+      "respuesta": {
+        "detail": [
+          {
+            "loc": [
+              "role"
+            ],
+            "msg": "Extra inputs are not permitted",
+            "type": "extra_forbidden"
+          },
+          {
+            "loc": [
+              "is_admin"
+            ],
+            "msg": "Extra inputs are not permitted",
+            "type": "extra_forbidden"
+          }
+        ]
+      }
+    },
+    {
+      "caso": "A relee su perfil",
+      "metodo": "GET",
+      "url": "/api/profile",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": null,
+      "esperado": "sin cambios",
+      "status": 200,
+      "retry_after": null,
+      "respuesta": {
+        "username": "usuarioa",
+        "full_name": "Usuario A",
+        "email": "usuarioa@lab.local",
+        "address": "Calle Ficticia 123, Ciudad Lab"
+      }
+    },
+    {
+      "caso": "B cambia solo su direccion",
+      "metodo": "PATCH",
+      "url": "/api/profile",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": {
+        "address": "Avenida Actualizada 99, Pueblo Lab"
+      },
+      "esperado": "200",
+      "status": 200,
+      "retry_after": null,
+      "respuesta": {
+        "username": "usuariob",
+        "full_name": "Usuario B",
+        "email": "usuariob@lab.local",
+        "address": "Avenida Actualizada 99, Pueblo Lab"
+      }
+    }
+  ]
+}

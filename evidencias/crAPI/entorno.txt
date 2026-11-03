@@ -1,0 +1,25 @@
+# Entorno del laboratorio - Bloque A (crAPI)
+# 2026-11-03T00:06:16Z
+
+$ docker --version
+Docker version 29.9.2, build a82e528
+
+$ docker compose version
+Docker Compose version v5.6.1
+
+$ systeminfo (OS)
+OS Name:                       Microsoft Windows 11 IoT Enterprise LTSC
+OS Version:                    10.0.26200 N/A Build 26200
+
+$ docker compose ps  (crAPI, en C:\labs\crAPI\deploy\docker)
+SERVICE                       STATUS                   PORTS
+api.mypremiumdealership.com   Up 8 minutes (healthy)   443/tcp
+chromadb                      Up 8 minutes (healthy)   8000/tcp
+crapi-chatbot                 Up 7 minutes             127.0.0.1:5500->5500/tcp
+crapi-community               Up 7 minutes (healthy)   6060/tcp
+crapi-identity                Up 8 minutes (healthy)   8080/tcp, 8989/tcp, 10001/tcp
+crapi-web                     Up 7 minutes (healthy)   127.0.0.1:8888->80/tcp, 127.0.0.1:30080->80/tcp, 127.0.0.1:8443->443/tcp, 127.0.0.1:30443->443/tcp
+crapi-workshop                Up 7 minutes (healthy)   
+mailhog                       Up 8 minutes (healthy)   127.0.0.1:8025->8025/tcp
+mongodb                       Up 8 minutes (healthy)   27017/tcp
+postgresdb                    Up 8 minutes (healthy)   5432/tcp

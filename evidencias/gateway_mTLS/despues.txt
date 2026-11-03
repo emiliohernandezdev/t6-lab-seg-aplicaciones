@@ -1,0 +1,69 @@
+# Gateway, segmentacion y mTLS - DESPUES
+# 2026-11-02T23:53:48+00:00
+# tokens recortados, cuentas y datos ficticios
+
+## cliente -> gateway por HTTPS
+> GET /api/orders
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 200
+< HTTP 200
+{"count":2,"orders":[{"id":1,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-100","name":"Filtro de aceite","quantity":2,"unit_price":12.5},{"product_id":"P-400","name":"Limpiaparabrisas","quantity":1,"unit_price":9.9}],"total":34.9,"created_at":"2026-11-02T23:53:35+00:00"},{"id":2,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-300","name":"Batería 12V","quantity":1,"unit_price":120.0}],"total":120.0,"created_at":"2026-11-02T23:53:35+00:00"}]}
+
+## ruta no publicada /healthz
+> GET /healthz
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 404
+< HTTP 404
+{"detail":"ruta no publicada por el gateway"}
+
+## ruta no publicada /docs
+> GET /docs
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 404
+< HTTP 404
+{"detail":"ruta no publicada por el gateway"}
+
+## ruta no publicada /api/internal
+> GET /api/internal
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 404
+< HTTP 404
+{"detail":"ruta no publicada por el gateway"}
+
+## token valido pidiendo pedido ajeno por el gateway
+> GET /api/orders/3
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 404
+< HTTP 404
+{"detail":"pedido no encontrado"}
+
+## directo a orders-api con el cert de cliente del gateway
+> GET https://orders-api:8443/api/orders/1
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 200
+< HTTP 200
+{"id":1,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-100","name":"Filtro de aceite","quantity":2,"unit_price":12.5},{"product_id":"P-400","name":"Limpiaparabrisas","quantity":1,"unit_price":9.9}],"total":34.9,"created_at":"2026-11-02T23:53:35+00:00"}
+
+## directo a orders-api sin cert de cliente
+> GET https://orders-api:8443/api/orders/1
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: falla el handshake
+< sin respuesta
+ReadError: [Errno 32] Broken pipe
+
+## directo a orders-api con cert de otra CA
+> GET https://orders-api:8443/api/orders/1
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: falla el handshake
+< sin respuesta
+RemoteProtocolError: Server disconnected without sending a response.
+
+ultimas lineas del log del gateway:
+172.18.0.4 [2026-11-02T23:53:41+00:00] "POST /api/orders HTTP/1.1" 403 40 rt=0.001 up=403 rid=ab5c8ac7da6b44f7ddf60261074e51b1
+172.18.0.4 [2026-11-02T23:53:41+00:00] "GET /api/orders HTTP/1.1" 200 545 rt=0.002 up=200 rid=e0136e9723a40c9b77562a878d0399c3
+172.18.0.4 [2026-11-02T23:53:48+00:00] "GET /api/orders HTTP/1.1" 401 26 rt=0.005 up=401 rid=bc0ecc057da9077ed46925bc9426e0b4
+172.18.0.4 [2026-11-02T23:53:48+00:00] "GET /api/orders HTTP/1.1" 200 545 rt=0.003 up=200 rid=1c1349f150bcb1c5d3fc08bec9e502de
+172.18.0.4 [2026-11-02T23:53:48+00:00] "GET /healthz HTTP/1.1" 404 45 rt=0.000 up=- rid=006a8e4f7127897880cc2ac939462046
+172.18.0.4 [2026-11-02T23:53:48+00:00] "GET /docs HTTP/1.1" 404 45 rt=0.000 up=- rid=8c907a6ea40de80688fff8afd29cdaa6
+172.18.0.4 [2026-11-02T23:53:48+00:00] "GET /api/internal HTTP/1.1" 404 45 rt=0.000 up=- rid=c01937418f716d3e338df17023cfd6d9
+172.18.0.4 [2026-11-02T23:53:48+00:00] "GET /api/orders/3 HTTP/1.1" 404 33 rt=0.002 up=404 rid=f1074f3b1dfda139a1fbe3e1618f63df

@@ -1,0 +1,6 @@
+# La misma ruta de ubicacion sin token
+# 2026-11-03T00:11:44Z · crAPI · token oculto
+
+> GET /identity/api/v2/vehicle/7061a86e-44ed-4ba7-9bd2-10630fc8b2bf/location
+< HTTP 401
+CRAPIResponse(message=Invalid Token, status=401)

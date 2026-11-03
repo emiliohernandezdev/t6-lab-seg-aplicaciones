@@ -1,0 +1,233 @@
+{
+  "titulo": "Validacion de esquema y rate limit",
+  "etapa": "despues",
+  "fecha": "2026-11-02T23:53:48+00:00",
+  "casos": [
+    {
+      "nota": "pedidos de A antes: 2"
+    },
+    {
+      "caso": "pedido valido",
+      "metodo": "POST",
+      "url": "/api/orders",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": {
+        "product_id": "P-300",
+        "quantity": 1,
+        "shipping_address": "Calle Ficticia 123, Ciudad Lab"
+      },
+      "esperado": "201",
+      "status": 201,
+      "retry_after": null,
+      "respuesta": {
+        "id": 5,
+        "status": "pagado",
+        "shipping_address": "Calle Ficticia 123, Ciudad Lab",
+        "items": [
+          {
+            "product_id": "P-300",
+            "name": "Batería 12V",
+            "quantity": 1,
+            "unit_price": 120.0
+          }
+        ],
+        "total": 120.0,
+        "created_at": "2026-11-02T23:53:48+00:00"
+      }
+    },
+    {
+      "caso": "quantity 0",
+      "metodo": "POST",
+      "url": "/api/orders",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": {
+        "product_id": "P-300",
+        "quantity": 0,
+        "shipping_address": "Calle Ficticia 123, Ciudad Lab"
+      },
+      "esperado": "422",
+      "status": 422,
+      "retry_after": null,
+      "respuesta": {
+        "detail": [
+          {
+            "loc": [
+              "quantity"
+            ],
+            "msg": "Input should be greater than or equal to 1",
+            "type": "greater_than_equal"
+          }
+        ]
+      }
+    },
+    {
+      "caso": "quantity 11",
+      "metodo": "POST",
+      "url": "/api/orders",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": {
+        "product_id": "P-300",
+        "quantity": 11,
+        "shipping_address": "Calle Ficticia 123, Ciudad Lab"
+      },
+      "esperado": "422",
+      "status": 422,
+      "retry_after": null,
+      "respuesta": {
+        "detail": [
+          {
+            "loc": [
+              "quantity"
+            ],
+            "msg": "Input should be less than or equal to 10",
+            "type": "less_than_equal"
+          }
+        ]
+      }
+    },
+    {
+      "caso": "quantity \"5\" como texto",
+      "metodo": "POST",
+      "url": "/api/orders",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": {
+        "product_id": "P-300",
+        "quantity": "5",
+        "shipping_address": "Calle Ficticia 123, Ciudad Lab"
+      },
+      "esperado": "422",
+      "status": 422,
+      "retry_after": null,
+      "respuesta": {
+        "detail": [
+          {
+            "loc": [
+              "quantity"
+            ],
+            "msg": "Input should be a valid integer",
+            "type": "int_type"
+          }
+        ]
+      }
+    },
+    {
+      "caso": "sin product_id",
+      "metodo": "POST",
+      "url": "/api/orders",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": {
+        "quantity": 1,
+        "shipping_address": "Calle Ficticia 123, Ciudad Lab"
+      },
+      "esperado": "422",
+      "status": 422,
+      "retry_after": null,
+      "respuesta": {
+        "detail": [
+          {
+            "loc": [
+              "product_id"
+            ],
+            "msg": "Field required",
+            "type": "missing"
+          }
+        ]
+      }
+    },
+    {
+      "caso": "direccion de 5 caracteres",
+      "metodo": "POST",
+      "url": "/api/orders",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": {
+        "product_id": "P-300",
+        "quantity": 1,
+        "shipping_address": "Calle"
+      },
+      "esperado": "422",
+      "status": 422,
+      "retry_after": null,
+      "respuesta": {
+        "detail": [
+          {
+            "loc": [
+              "shipping_address"
+            ],
+            "msg": "String should have at least 10 characters",
+            "type": "string_too_short"
+          }
+        ]
+      }
+    },
+    {
+      "caso": "campo extra price=0",
+      "metodo": "POST",
+      "url": "/api/orders",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": {
+        "product_id": "P-300",
+        "quantity": 1,
+        "shipping_address": "Calle Ficticia 123, Ciudad Lab",
+        "price": 0
+      },
+      "esperado": "422",
+      "status": 422,
+      "retry_after": null,
+      "respuesta": {
+        "detail": [
+          {
+            "loc": [
+              "price"
+            ],
+            "msg": "Extra inputs are not permitted",
+            "type": "extra_forbidden"
+          }
+        ]
+      }
+    },
+    {
+      "nota": "pedidos de A despues: 3 (deberia ser 3, solo el valido)"
+    },
+    {
+      "nota": "11 GET /api/orders/1 seguidos de usuarioa: #1:200 #2:200 #3:200 #4:200 #5:200 #6:200 #7:200 #8:200 #9:200 #10:200 #11:429"
+    },
+    {
+      "caso": "peticion 12 de usuarioa",
+      "metodo": "GET",
+      "url": "/api/orders/1",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": null,
+      "esperado": "429",
+      "status": 429,
+      "retry_after": "10",
+      "respuesta": {
+        "detail": "demasiadas solicitudes"
+      }
+    },
+    {
+      "caso": "usuariob en el mismo momento",
+      "metodo": "GET",
+      "url": "/api/orders/3",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": null,
+      "esperado": "200 (tiene su propia cuota)",
+      "status": 200,
+      "retry_after": null,
+      "respuesta": {
+        "id": 3,
+        "status": "pagado",
+        "shipping_address": "Avenida Inventada 456, Pueblo Lab",
+        "items": [
+          {
+            "product_id": "P-200",
+            "name": "Pastillas de freno",
+            "quantity": 4,
+            "unit_price": 45.0
+          }
+        ],
+        "total": 180.0,
+        "created_at": "2026-11-02T23:53:35+00:00"
+      }
+    }
+  ]
+}

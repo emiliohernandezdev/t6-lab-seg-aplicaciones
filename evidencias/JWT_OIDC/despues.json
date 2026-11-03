@@ -1,0 +1,233 @@
+{
+  "titulo": "OAuth 2.0 / OIDC y JWT",
+  "etapa": "despues",
+  "fecha": "2026-11-02T23:53:41+00:00",
+  "casos": [
+    {
+      "nota": "claims del access token de usuarioa (decodificado, NO validado):\n{\"iss\": \"http://localhost:8080/realms/lab\", \"aud\": \"orders-api\", \"typ\": \"Bearer\", \"azp\": \"lab-cli\", \"scope\": \"openid orders:read orders:write\", \"realm_access\": {\"roles\": [\"user\"]}, \"exp\": 1793663921}"
+    },
+    {
+      "caso": "token valido",
+      "metodo": "GET",
+      "url": "/api/orders",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": null,
+      "esperado": "200",
+      "status": 200,
+      "retry_after": null,
+      "respuesta": {
+        "count": 2,
+        "orders": [
+          {
+            "id": 1,
+            "status": "pagado",
+            "shipping_address": "Calle Ficticia 123, Ciudad Lab",
+            "items": [
+              {
+                "product_id": "P-100",
+                "name": "Filtro de aceite",
+                "quantity": 2,
+                "unit_price": 12.5
+              },
+              {
+                "product_id": "P-400",
+                "name": "Limpiaparabrisas",
+                "quantity": 1,
+                "unit_price": 9.9
+              }
+            ],
+            "total": 34.9,
+            "created_at": "2026-11-02T23:53:35+00:00"
+          },
+          {
+            "id": 2,
+            "status": "pagado",
+            "shipping_address": "Calle Ficticia 123, Ciudad Lab",
+            "items": [
+              {
+                "product_id": "P-300",
+                "name": "Batería 12V",
+                "quantity": 1,
+                "unit_price": 120.0
+              }
+            ],
+            "total": 120.0,
+            "created_at": "2026-11-02T23:53:35+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "caso": "sin token",
+      "metodo": "GET",
+      "url": "/api/orders",
+      "authorization": null,
+      "body": null,
+      "esperado": "401",
+      "status": 401,
+      "retry_after": null,
+      "respuesta": {
+        "detail": "falta el token Bearer"
+      }
+    },
+    {
+      "caso": "payload cambiado para meter rol admin (misma firma)",
+      "metodo": "GET",
+      "url": "/api/admin/audit",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": null,
+      "esperado": "401",
+      "status": 401,
+      "retry_after": null,
+      "respuesta": {
+        "detail": "token inválido"
+      }
+    },
+    {
+      "caso": "firma alterada",
+      "metodo": "GET",
+      "url": "/api/orders",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": null,
+      "esperado": "401",
+      "status": 401,
+      "retry_after": null,
+      "respuesta": {
+        "detail": "token inválido"
+      }
+    },
+    {
+      "caso": "alg=none con rol admin",
+      "metodo": "GET",
+      "url": "/api/admin/audit",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": null,
+      "esperado": "401",
+      "status": 401,
+      "retry_after": null,
+      "respuesta": {
+        "detail": "algoritmo no permitido"
+      }
+    },
+    {
+      "caso": "token del realm 'otro' (rol admin, aud orders-api)",
+      "metodo": "GET",
+      "url": "/api/admin/audit",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": null,
+      "esperado": "401",
+      "status": 401,
+      "retry_after": null,
+      "respuesta": {
+        "detail": "clave de firma desconocida"
+      }
+    },
+    {
+      "caso": "ID token en vez de access token",
+      "metodo": "GET",
+      "url": "/api/orders",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": null,
+      "esperado": "401",
+      "status": 401,
+      "retry_after": null,
+      "respuesta": {
+        "detail": "audiencia incorrecta"
+      }
+    },
+    {
+      "caso": "token sin scope orders:read",
+      "metodo": "GET",
+      "url": "/api/orders",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": null,
+      "esperado": "403",
+      "status": 403,
+      "retry_after": null,
+      "respuesta": {
+        "detail": "falta el scope orders:read"
+      }
+    },
+    {
+      "caso": "token solo con orders:read intenta crear",
+      "metodo": "POST",
+      "url": "/api/orders",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": {
+        "product_id": "P-100",
+        "quantity": 1,
+        "shipping_address": "Calle Ficticia 123, Ciudad Lab"
+      },
+      "esperado": "403",
+      "status": 403,
+      "retry_after": null,
+      "respuesta": {
+        "detail": "falta el scope orders:write"
+      }
+    },
+    {
+      "caso": "token de 5 s recien emitido",
+      "metodo": "GET",
+      "url": "/api/orders",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": null,
+      "esperado": "200",
+      "status": 200,
+      "retry_after": null,
+      "respuesta": {
+        "count": 2,
+        "orders": [
+          {
+            "id": 1,
+            "status": "pagado",
+            "shipping_address": "Calle Ficticia 123, Ciudad Lab",
+            "items": [
+              {
+                "product_id": "P-100",
+                "name": "Filtro de aceite",
+                "quantity": 2,
+                "unit_price": 12.5
+              },
+              {
+                "product_id": "P-400",
+                "name": "Limpiaparabrisas",
+                "quantity": 1,
+                "unit_price": 9.9
+              }
+            ],
+            "total": 34.9,
+            "created_at": "2026-11-02T23:53:35+00:00"
+          },
+          {
+            "id": 2,
+            "status": "pagado",
+            "shipping_address": "Calle Ficticia 123, Ciudad Lab",
+            "items": [
+              {
+                "product_id": "P-300",
+                "name": "Batería 12V",
+                "quantity": 1,
+                "unit_price": 120.0
+              }
+            ],
+            "total": 120.0,
+            "created_at": "2026-11-02T23:53:35+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "caso": "el mismo token 7 s despues",
+      "metodo": "GET",
+      "url": "/api/orders",
+      "authorization": "Bearer eyJ…[OCULTO]",
+      "body": null,
+      "esperado": "401 token vencido",
+      "status": 401,
+      "retry_after": null,
+      "respuesta": {
+        "detail": "token vencido"
+      }
+    }
+  ]
+}

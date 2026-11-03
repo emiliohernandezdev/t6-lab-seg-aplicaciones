@@ -1,0 +1,21 @@
+# desde el host, 2026-11-02T23:54:46Z
+
+$ docker compose ps
+SERVICE      STATUS                    PORTS
+gateway      Up About a minute         127.0.0.1:8443->8443/tcp
+keycloak     Up 19 minutes (healthy)   127.0.0.1:8080->8080/tcp
+orders-api   Up About a minute         8443/tcp
+
+$ docker compose port orders-api 8443
+:0
+(":0" o vacio = el puerto no esta publicado en el host)
+
+$ curl -sk https://127.0.0.1:8443/healthz
+HTTP 404
+
+$ curl --cacert certs/ca.crt https://localhost:8443/api/orders   (sin token)
+{"detail":"falta el token Bearer"}
+HTTP 401
+
+$ docker network inspect t6-orders_backend
+internal=true

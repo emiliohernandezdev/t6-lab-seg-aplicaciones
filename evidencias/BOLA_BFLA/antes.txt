@@ -1,0 +1,61 @@
+# BOLA, BFLA y propiedades - ANTES
+# 2026-11-02T23:53:14+00:00
+# tokens recortados, cuentas y datos ficticios
+
+## A pide su pedido 1
+> GET /api/orders/1
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 200
+< HTTP 200
+{"id":1,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-100","name":"Filtro de aceite","quantity":2,"unit_price":12.5},{"product_id":"P-400","name":"Limpiaparabrisas","quantity":1,"unit_price":9.9}],"total":34.9,"created_at":"2026-11-02T23:53:09+00:00"}
+
+## A pide el pedido 3, que es de B
+> GET /api/orders/3
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 404
+< HTTP 200
+{"id":3,"status":"pagado","shipping_address":"Avenida Inventada 456, Pueblo Lab","items":[{"product_id":"P-200","name":"Pastillas de freno","quantity":4,"unit_price":45.0}],"total":180.0,"created_at":"2026-11-02T23:53:09+00:00"}
+
+## admin pide la auditoria
+> GET /api/admin/audit
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 200
+< HTTP 200
+[]
+
+## usuarioa pide la auditoria
+> GET /api/admin/audit
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 403
+< HTTP 200
+[]
+
+## A pide su perfil
+> GET /api/profile
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 200 solo con username, full_name, email y address
+< HTTP 200
+{"id":"a1a1a1a1-0000-4000-8000-00000000000a","username":"usuarioa","full_name":"Usuario A","email":"usuarioa@lab.local","address":"Calle Ficticia 123, Ciudad Lab","password_hash":"$2b$12$FAKEHASHusuarioaXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX","role":"user","is_admin":false,"internal_notes":"Cliente con reclamo abierto #4411","payment_card":"4111-1111-1111-1111"}
+
+## A intenta ponerse role=admin con PATCH
+> PATCH /api/profile
+> Authorization: Bearer eyJ…[OCULTO]
+> {"address": "Calle Escalada 1, Ciudad Lab", "role": "admin", "is_admin": true}
+# esperado: 422
+< HTTP 200
+{"id":"a1a1a1a1-0000-4000-8000-00000000000a","username":"usuarioa","full_name":"Usuario A","email":"usuarioa@lab.local","address":"Calle Escalada 1, Ciudad Lab","password_hash":"$2b$12$FAKEHASHusuarioaXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX","role":"admin","is_admin":true,"internal_notes":"Cliente con reclamo abierto #4411","payment_card":"4111-1111-1111-1111"}
+
+## A relee su perfil
+> GET /api/profile
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: sin cambios
+< HTTP 200
+{"id":"a1a1a1a1-0000-4000-8000-00000000000a","username":"usuarioa","full_name":"Usuario A","email":"usuarioa@lab.local","address":"Calle Escalada 1, Ciudad Lab","password_hash":"$2b$12$FAKEHASHusuarioaXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX","role":"admin","is_admin":true,"internal_notes":"Cliente con reclamo abierto #4411","payment_card":"4111-1111-1111-1111"}
+
+## B cambia solo su direccion
+> PATCH /api/profile
+> Authorization: Bearer eyJ…[OCULTO]
+> {"address": "Avenida Actualizada 99, Pueblo Lab"}
+# esperado: 200
+< HTTP 200
+{"id":"b2b2b2b2-0000-4000-8000-00000000000b","username":"usuariob","full_name":"Usuario B","email":"usuariob@lab.local","address":"Avenida Actualizada 99, Pueblo Lab","password_hash":"$2b$12$FAKEHASHusuariobXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX","role":"user","is_admin":false,"internal_notes":"VIP - descuento manual 15%","payment_card":"5500-0000-0000-0004"}

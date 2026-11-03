@@ -1,0 +1,39 @@
+{
+  "realm": "otro",
+  "displayName": "Realm ajeno (prueba de iss incorrecto)",
+  "enabled": true,
+  "accessTokenLifespan": 300,
+  "defaultDefaultClientScopes": [],
+  "defaultOptionalClientScopes": [],
+  "roles": { "realm": [ { "name": "user" }, { "name": "admin" } ] },
+  "clientScopes": [
+    { "name": "orders:read", "protocol": "openid-connect", "attributes": { "include.in.token.scope": "true" } },
+    { "name": "orders:write", "protocol": "openid-connect", "attributes": { "include.in.token.scope": "true" } }
+  ],
+  "clients": [
+    { "clientId": "orders-api", "enabled": true, "bearerOnly": true, "publicClient": false,
+      "standardFlowEnabled": false, "directAccessGrantsEnabled": false },
+    {
+      "clientId": "lab-cli", "enabled": true, "publicClient": true,
+      "standardFlowEnabled": false, "directAccessGrantsEnabled": true, "fullScopeAllowed": true,
+      "defaultClientScopes": [], "optionalClientScopes": ["orders:read", "orders:write"],
+      "protocolMappers": [
+        { "name": "sub", "protocol": "openid-connect", "protocolMapper": "oidc-sub-mapper",
+          "config": { "access.token.claim": "true" } },
+        { "name": "realm roles", "protocol": "openid-connect", "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "config": { "claim.name": "realm_access.roles", "multivalued": "true", "jsonType.label": "String", "access.token.claim": "true" } },
+        { "name": "aud orders-api", "protocol": "openid-connect", "protocolMapper": "oidc-audience-mapper",
+          "config": { "included.client.audience": "orders-api", "access.token.claim": "true" } }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "id": "c3c3c3c3-0000-4000-8000-0000000000c3",
+      "username": "intruso", "enabled": true, "emailVerified": true,
+      "firstName": "Intruso", "lastName": "Otro", "email": "intruso@otro.local",
+      "credentials": [{ "type": "password", "value": "LabIntruso-2026!", "temporary": false }],
+      "realmRoles": ["user", "admin"]
+    }
+  ]
+}

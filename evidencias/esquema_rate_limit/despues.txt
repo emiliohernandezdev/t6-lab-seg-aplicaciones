@@ -1,0 +1,80 @@
+# Validacion de esquema y rate limit - DESPUES
+# 2026-11-02T23:53:48+00:00
+# tokens recortados, cuentas y datos ficticios
+
+pedidos de A antes: 2
+
+## pedido valido
+> POST /api/orders
+> Authorization: Bearer eyJ…[OCULTO]
+> {"product_id": "P-300", "quantity": 1, "shipping_address": "Calle Ficticia 123, Ciudad Lab"}
+# esperado: 201
+< HTTP 201
+{"id":5,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-300","name":"Batería 12V","quantity":1,"unit_price":120.0}],"total":120.0,"created_at":"2026-11-02T23:53:48+00:00"}
+
+## quantity 0
+> POST /api/orders
+> Authorization: Bearer eyJ…[OCULTO]
+> {"product_id": "P-300", "quantity": 0, "shipping_address": "Calle Ficticia 123, Ciudad Lab"}
+# esperado: 422
+< HTTP 422
+{"detail":[{"loc":["quantity"],"msg":"Input should be greater than or equal to 1","type":"greater_than_equal"}]}
+
+## quantity 11
+> POST /api/orders
+> Authorization: Bearer eyJ…[OCULTO]
+> {"product_id": "P-300", "quantity": 11, "shipping_address": "Calle Ficticia 123, Ciudad Lab"}
+# esperado: 422
+< HTTP 422
+{"detail":[{"loc":["quantity"],"msg":"Input should be less than or equal to 10","type":"less_than_equal"}]}
+
+## quantity "5" como texto
+> POST /api/orders
+> Authorization: Bearer eyJ…[OCULTO]
+> {"product_id": "P-300", "quantity": "5", "shipping_address": "Calle Ficticia 123, Ciudad Lab"}
+# esperado: 422
+< HTTP 422
+{"detail":[{"loc":["quantity"],"msg":"Input should be a valid integer","type":"int_type"}]}
+
+## sin product_id
+> POST /api/orders
+> Authorization: Bearer eyJ…[OCULTO]
+> {"quantity": 1, "shipping_address": "Calle Ficticia 123, Ciudad Lab"}
+# esperado: 422
+< HTTP 422
+{"detail":[{"loc":["product_id"],"msg":"Field required","type":"missing"}]}
+
+## direccion de 5 caracteres
+> POST /api/orders
+> Authorization: Bearer eyJ…[OCULTO]
+> {"product_id": "P-300", "quantity": 1, "shipping_address": "Calle"}
+# esperado: 422
+< HTTP 422
+{"detail":[{"loc":["shipping_address"],"msg":"String should have at least 10 characters","type":"string_too_short"}]}
+
+## campo extra price=0
+> POST /api/orders
+> Authorization: Bearer eyJ…[OCULTO]
+> {"product_id": "P-300", "quantity": 1, "shipping_address": "Calle Ficticia 123, Ciudad Lab", "price": 0}
+# esperado: 422
+< HTTP 422
+{"detail":[{"loc":["price"],"msg":"Extra inputs are not permitted","type":"extra_forbidden"}]}
+
+pedidos de A despues: 3 (deberia ser 3, solo el valido)
+
+11 GET /api/orders/1 seguidos de usuarioa: #1:200 #2:200 #3:200 #4:200 #5:200 #6:200 #7:200 #8:200 #9:200 #10:200 #11:429
+
+## peticion 12 de usuarioa
+> GET /api/orders/1
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 429
+< HTTP 429
+< Retry-After: 10
+{"detail":"demasiadas solicitudes"}
+
+## usuariob en el mismo momento
+> GET /api/orders/3
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 200 (tiene su propia cuota)
+< HTTP 200
+{"id":3,"status":"pagado","shipping_address":"Avenida Inventada 456, Pueblo Lab","items":[{"product_id":"P-200","name":"Pastillas de freno","quantity":4,"unit_price":45.0}],"total":180.0,"created_at":"2026-11-02T23:53:35+00:00"}

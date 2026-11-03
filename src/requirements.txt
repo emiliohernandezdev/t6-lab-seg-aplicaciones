@@ -1,0 +1,6 @@
+fastapi==0.115.6
+uvicorn==0.32.1
+pydantic==2.10.4
+PyJWT[crypto]==2.10.1
+strawberry-graphql==0.254.0
+graphql-core==3.2.5

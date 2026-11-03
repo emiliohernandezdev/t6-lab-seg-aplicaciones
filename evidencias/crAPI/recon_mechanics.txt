@@ -1,0 +1,7 @@
+# Lista de mecanicos
+# 2026-11-03T00:11:42Z · crAPI · token oculto
+
+> GET /workshop/api/mechanic/
+> Authorization: Bearer eyJhbG…[OCULTO]
+< HTTP 200
+{"mechanics":[{"id":1,"mechanic_code":"TRAC_JHN","user":{"email":"jhon@example.com","number":""}},{"id":2,"mechanic_code":"TRAC_JME","user":{"email":"james@example.com","number":""}}],"previous_offset":null,"next_offset":null}

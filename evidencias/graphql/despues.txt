@@ -1,0 +1,53 @@
+# GraphQL - DESPUES
+# 2026-11-02T23:53:48+00:00
+# tokens recortados, cuentas y datos ficticios
+
+## consulta normal (profundidad 3)
+> POST /graphql
+> Authorization: Bearer eyJ…[OCULTO]
+> {"query": "{ me { nombre pedidos(first: 5) { id total articulos(first: 5) { nombre cantidad } } } }"}
+# esperado: datos de A
+< HTTP 200
+{"data": {"me": {"nombre": "Usuario A", "pedidos": [{"id": 1, "total": 34.9, "articulos": [{"nombre": "Filtro de aceite", "cantidad": 2}, {"nombre": "Limpiaparabrisas", "cantidad": 1}]}, {"id": 2, "total": 120.0, "articulos": [{"nombre": "Bater\u00eda 12V", "cantidad": 1}]}]}}}
+
+## A pide el pedido 3 (de B)
+> POST /graphql
+> Authorization: Bearer eyJ…[OCULTO]
+> {"query": "{ pedido(id: 3) { id total direccionEnvio } }"}
+# esperado: pedido: null
+< HTTP 200
+{"data": {"pedido": null}}
+
+## profundidad 6
+> POST /graphql
+> Authorization: Bearer eyJ…[OCULTO]
+> {"query": "{ me { pedidos { articulos { pedido { propietario { pedidos { id } } } } } } }"}
+# esperado: error de profundidad
+< HTTP 200
+{"data": null, "errors": [{"message": "'anonymous' exceeds maximum operation depth of 3", "locations": [{"line": 1, "column": 39}]}, {"message": "Consulta demasiado costosa: 2612 > 500", "locations": [{"line": 1, "column": 1}]}]}
+
+tiempo de respuesta: 0.004 s
+
+## lista con first: 50
+> POST /graphql
+> Authorization: Bearer eyJ…[OCULTO]
+> {"query": "{ me { pedidos(first: 50) { id } } }"}
+# esperado: error por first
+< HTTP 200
+{"data": null, "errors": [{"message": "'first' excede el m\u00e1ximo de 20", "locations": [{"line": 1, "column": 8}]}]}
+
+## consulta costosa (3 alias x 20 x 20)
+> POST /graphql
+> Authorization: Bearer eyJ…[OCULTO]
+> {"query": "{ me { p0: pedidos(first: 20) { articulos(first: 20) { nombre cantidad precioUnitario productId } } p1: pedidos(first: 20) { articulos(first: 20) { nombre cantidad precioUnitario productId } } p2: pedidos(first: 20) { articulos(first: 20) { nombre cantidad precioUnitario productId } } } }"}
+# esperado: error de costo
+< HTTP 200
+{"data": null, "errors": [{"message": "Consulta demasiado costosa: 4864 > 500", "locations": [{"line": 1, "column": 1}]}]}
+
+## introspeccion en prod
+> POST /graphql
+> Authorization: Bearer eyJ…[OCULTO]
+> {"query": "{ __schema { queryType { name } types { name } } }"}
+# esperado: rechazada
+< HTTP 200
+{"data": null, "errors": [{"message": "GraphQL introspection has been disabled, but the requested query contained the field '__schema'.", "locations": [{"line": 1, "column": 3}]}, {"message": "GraphQL introspection has been disabled, but the requested query contained the field 'queryType'.", "locations": [{"line": 1, "column": 14}]}, {"message": "GraphQL introspection has been disabled, but the requested query contained the field 'types'.", "locations": [{"line": 1, "column": 33}]}]}

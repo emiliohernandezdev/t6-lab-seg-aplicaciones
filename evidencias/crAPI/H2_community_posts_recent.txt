@@ -1,0 +1,7 @@
+# Feed de la comunidad: expone correo y vehicleid de otros
+# 2026-11-03T00:11:43Z · crAPI · token oculto
+
+> GET /community/api/v2/community/posts/recent?limit=5&offset=0
+> Authorization: Bearer eyJhbG…[OCULTO]
+< HTTP 200
+{"posts":[{"id":"tssHEWvx3guyXtG4w4Y5tZ","title":"Title 3","content":"Hello world 3","author":{"nickname":"Robot","email":"robot001@example.com","vehicleid":"4bae9968-ec7f-4de3-a3a0-ba1b2ab5e5e5","profile_pic_url":"","created_at":"2026-11-02T23:58:26.401Z"},"comments":[],"authorid":3,"CreatedAt":"2026-11-02T23:58:26.401Z"},{"id":"L84zwLBu7wQfqryCTdwQu8","title":"Title 2","content":"Hello world 2","author":{"nickname":"Pogba","email":"pogba006@example.com","vehicleid":"cd515c12-0fc1-48ae-8b61-9230b70a845b","profile_pic_url":"","created_at":"2026-11-02T23:58:26.399Z"},"comments":[],"authorid":2,"CreatedAt":"2026-11-02T23:58:26.399Z"},{"id":"3Xs7e6sVERzGPbqLt56gWN","title":"Title 1","content":"Hello world 1","author":{"nickname":"Adam","email":"adam007@example.com","vehicleid":"f89b5f21-7829-45cb-a650-299a61090378","profile_pic_url":"","created_at":"2026-11-02T23:58:26.386Z"},"comments":[],"authorid":1,"CreatedAt":"2026-11-02T23:58:26.386Z"}],"next_offset":null,"previous_offset":null,"total":3}

@@ -1,0 +1,7 @@
+# Catalogo de la tienda
+# 2026-11-03T00:11:42Z · crAPI · token oculto
+
+> GET /workshop/api/shop/products
+> Authorization: Bearer eyJhbG…[OCULTO]
+< HTTP 200
+{"products":[{"id":2,"name":"Wheel","price":"10.00","image_url":"images/wheel.svg"},{"id":1,"name":"Seat","price":"10.00","image_url":"images/seat.svg"}],"credit":100.0,"next_offset":null,"previous_offset":null,"count":2}

@@ -1,0 +1,10 @@
+# Secretos: nunca se entregan
+certs/*.key
+certs/**/*.key
+*.pem.key
+.env
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/

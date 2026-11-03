@@ -1,0 +1,113 @@
+{
+  "realm": "lab",
+  "displayName": "T6 Lab (datos ficticios)",
+  "enabled": true,
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "bruteForceProtected": true,
+  "defaultDefaultClientScopes": [],
+  "defaultOptionalClientScopes": [],
+  "roles": {
+    "realm": [
+      { "name": "user", "description": "Cliente de la tienda" },
+      { "name": "admin", "description": "Administrador: puede leer la auditoría" }
+    ]
+  },
+  "clientScopes": [
+    {
+      "name": "orders:read",
+      "description": "Leer pedidos propios",
+      "protocol": "openid-connect",
+      "attributes": { "include.in.token.scope": "true", "display.on.consent.screen": "false" }
+    },
+    {
+      "name": "orders:write",
+      "description": "Crear pedidos",
+      "protocol": "openid-connect",
+      "attributes": { "include.in.token.scope": "true", "display.on.consent.screen": "false" }
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "orders-api",
+      "name": "Orders API (audiencia / resource server)",
+      "enabled": true,
+      "publicClient": false,
+      "bearerOnly": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false
+    },
+    {
+      "clientId": "lab-cli",
+      "name": "CLI de laboratorio (obtiene tokens para pruebas)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "fullScopeAllowed": true,
+      "defaultClientScopes": [],
+      "optionalClientScopes": ["orders:read", "orders:write"],
+      "protocolMappers": [
+        { "name": "sub", "protocol": "openid-connect", "protocolMapper": "oidc-sub-mapper",
+          "config": { "access.token.claim": "true", "introspection.token.claim": "true" } },
+        { "name": "username", "protocol": "openid-connect", "protocolMapper": "oidc-usermodel-property-mapper",
+          "config": { "user.attribute": "username", "claim.name": "preferred_username", "jsonType.label": "String",
+                      "access.token.claim": "true", "id.token.claim": "true", "introspection.token.claim": "true" } },
+        { "name": "realm roles", "protocol": "openid-connect", "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "config": { "claim.name": "realm_access.roles", "multivalued": "true", "jsonType.label": "String",
+                      "access.token.claim": "true", "id.token.claim": "false", "introspection.token.claim": "true" } },
+        { "name": "aud orders-api", "protocol": "openid-connect", "protocolMapper": "oidc-audience-mapper",
+          "config": { "included.client.audience": "orders-api", "access.token.claim": "true",
+                      "id.token.claim": "false", "introspection.token.claim": "true" } }
+      ]
+    },
+    {
+      "clientId": "lab-cli-corto",
+      "name": "CLI con tokens de vida corta (prueba de token vencido)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "fullScopeAllowed": true,
+      "attributes": { "access.token.lifespan": "5" },
+      "defaultClientScopes": [],
+      "optionalClientScopes": ["orders:read", "orders:write"],
+      "protocolMappers": [
+        { "name": "sub", "protocol": "openid-connect", "protocolMapper": "oidc-sub-mapper",
+          "config": { "access.token.claim": "true", "introspection.token.claim": "true" } },
+        { "name": "username", "protocol": "openid-connect", "protocolMapper": "oidc-usermodel-property-mapper",
+          "config": { "user.attribute": "username", "claim.name": "preferred_username", "jsonType.label": "String",
+                      "access.token.claim": "true", "id.token.claim": "true" } },
+        { "name": "realm roles", "protocol": "openid-connect", "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "config": { "claim.name": "realm_access.roles", "multivalued": "true", "jsonType.label": "String",
+                      "access.token.claim": "true" } },
+        { "name": "aud orders-api", "protocol": "openid-connect", "protocolMapper": "oidc-audience-mapper",
+          "config": { "included.client.audience": "orders-api", "access.token.claim": "true", "id.token.claim": "false" } }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "id": "a1a1a1a1-0000-4000-8000-00000000000a",
+      "username": "usuarioa", "enabled": true, "emailVerified": true,
+      "firstName": "Usuario", "lastName": "A", "email": "usuarioa@lab.local",
+      "credentials": [{ "type": "password", "value": "LabUsuarioA-2026!", "temporary": false }],
+      "realmRoles": ["user"]
+    },
+    {
+      "id": "b2b2b2b2-0000-4000-8000-00000000000b",
+      "username": "usuariob", "enabled": true, "emailVerified": true,
+      "firstName": "Usuario", "lastName": "B", "email": "usuariob@lab.local",
+      "credentials": [{ "type": "password", "value": "LabUsuarioB-2026!", "temporary": false }],
+      "realmRoles": ["user"]
+    },
+    {
+      "id": "adadadad-0000-4000-8000-0000000000ad",
+      "username": "admin", "enabled": true, "emailVerified": true,
+      "firstName": "Admin", "lastName": "Lab", "email": "admin@lab.local",
+      "credentials": [{ "type": "password", "value": "LabAdmin-2026!", "temporary": false }],
+      "realmRoles": ["user", "admin"]
+    }
+  ]
+}

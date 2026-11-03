@@ -1,0 +1,83 @@
+# OAuth 2.0 / OIDC y JWT - ANTES
+# 2026-11-02T23:53:14+00:00
+# tokens recortados, cuentas y datos ficticios
+
+claims del access token de usuarioa (decodificado, NO validado):
+{"iss": "http://localhost:8080/realms/lab", "aud": "orders-api", "typ": "Bearer", "azp": "lab-cli", "scope": "openid orders:read orders:write", "realm_access": {"roles": ["user"]}, "exp": 1793663894}
+
+## token valido
+> GET /api/orders
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 200
+< HTTP 200
+{"count":2,"orders":[{"id":1,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-100","name":"Filtro de aceite","quantity":2,"unit_price":12.5},{"product_id":"P-400","name":"Limpiaparabrisas","quantity":1,"unit_price":9.9}],"total":34.9,"created_at":"2026-11-02T23:53:09+00:00"},{"id":2,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-300","name":"Batería 12V","quantity":1,"unit_price":120.0}],"total":120.0,"created_at":"2026-11-02T23:53:09+00:00"}]}
+
+## sin token
+> GET /api/orders
+# esperado: 401
+< HTTP 401
+{"detail":"falta el token Bearer"}
+
+## payload cambiado para meter rol admin (misma firma)
+> GET /api/admin/audit
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 401
+< HTTP 200
+[]
+
+## firma alterada
+> GET /api/orders
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 401
+< HTTP 200
+{"count":2,"orders":[{"id":1,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-100","name":"Filtro de aceite","quantity":2,"unit_price":12.5},{"product_id":"P-400","name":"Limpiaparabrisas","quantity":1,"unit_price":9.9}],"total":34.9,"created_at":"2026-11-02T23:53:09+00:00"},{"id":2,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-300","name":"Batería 12V","quantity":1,"unit_price":120.0}],"total":120.0,"created_at":"2026-11-02T23:53:09+00:00"}]}
+
+## alg=none con rol admin
+> GET /api/admin/audit
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 401
+< HTTP 200
+[]
+
+## token del realm 'otro' (rol admin, aud orders-api)
+> GET /api/admin/audit
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 401
+< HTTP 200
+[]
+
+## ID token en vez de access token
+> GET /api/orders
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 401
+< HTTP 200
+{"count":2,"orders":[{"id":1,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-100","name":"Filtro de aceite","quantity":2,"unit_price":12.5},{"product_id":"P-400","name":"Limpiaparabrisas","quantity":1,"unit_price":9.9}],"total":34.9,"created_at":"2026-11-02T23:53:09+00:00"},{"id":2,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-300","name":"Batería 12V","quantity":1,"unit_price":120.0}],"total":120.0,"created_at":"2026-11-02T23:53:09+00:00"}]}
+
+## token sin scope orders:read
+> GET /api/orders
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 403
+< HTTP 200
+{"count":2,"orders":[{"id":1,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-100","name":"Filtro de aceite","quantity":2,"unit_price":12.5},{"product_id":"P-400","name":"Limpiaparabrisas","quantity":1,"unit_price":9.9}],"total":34.9,"created_at":"2026-11-02T23:53:09+00:00"},{"id":2,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-300","name":"Batería 12V","quantity":1,"unit_price":120.0}],"total":120.0,"created_at":"2026-11-02T23:53:09+00:00"}]}
+
+## token solo con orders:read intenta crear
+> POST /api/orders
+> Authorization: Bearer eyJ…[OCULTO]
+> {"product_id": "P-100", "quantity": 1, "shipping_address": "Calle Ficticia 123, Ciudad Lab"}
+# esperado: 403
+< HTTP 201
+{"id":5,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-100","name":"Filtro de aceite","quantity":1,"unit_price":12.5}],"total":12.5,"created_at":"2026-11-02T23:53:14+00:00"}
+
+## token de 5 s recien emitido
+> GET /api/orders
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 200
+< HTTP 200
+{"count":3,"orders":[{"id":1,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-100","name":"Filtro de aceite","quantity":2,"unit_price":12.5},{"product_id":"P-400","name":"Limpiaparabrisas","quantity":1,"unit_price":9.9}],"total":34.9,"created_at":"2026-11-02T23:53:09+00:00"},{"id":2,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-300","name":"Batería 12V","quantity":1,"unit_price":120.0}],"total":120.0,"created_at":"2026-11-02T23:53:09+00:00"},{"id":5,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-100","name":"Filtro de aceite","quantity":1,"unit_price":12.5}],"total":12.5,"created_at":"2026-11-02T23:53:14+00:00"}]}
+
+## el mismo token 7 s despues
+> GET /api/orders
+> Authorization: Bearer eyJ…[OCULTO]
+# esperado: 401 token vencido
+< HTTP 200
+{"count":3,"orders":[{"id":1,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-100","name":"Filtro de aceite","quantity":2,"unit_price":12.5},{"product_id":"P-400","name":"Limpiaparabrisas","quantity":1,"unit_price":9.9}],"total":34.9,"created_at":"2026-11-02T23:53:09+00:00"},{"id":2,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-300","name":"Batería 12V","quantity":1,"unit_price":120.0}],"total":120.0,"created_at":"2026-11-02T23:53:09+00:00"},{"id":5,"status":"pagado","shipping_address":"Calle Ficticia 123, Ciudad Lab","items":[{"product_id":"P-100","name":"Filtro de aceite","quantity":1,"unit_price":12.5}],"total":12.5,"created_at":"2026-11-02T23:53:14+00:00"}]}

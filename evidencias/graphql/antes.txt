@@ -1,0 +1,53 @@
+# GraphQL - ANTES
+# 2026-11-02T23:53:21+00:00
+# tokens recortados, cuentas y datos ficticios
+
+## consulta normal (profundidad 3)
+> POST /graphql
+> Authorization: Bearer eyJ…[OCULTO]
+> {"query": "{ me { nombre pedidos(first: 5) { id total articulos(first: 5) { nombre cantidad } } } }"}
+# esperado: datos de A
+< HTTP 200
+{"data": {"me": {"nombre": "Usuario A", "pedidos": [{"id": 1, "total": 34.9, "articulos": [{"nombre": "Filtro de aceite", "cantidad": 2}, {"nombre": "Limpiaparabrisas", "cantidad": 1}]}, {"id": 2, "total": 120.0, "articulos": [{"nombre": "Bater\u00eda 12V", "cantidad": 1}]}, {"id": 5, "total": 12.5, "articulos": [{"nombre": "Filtro de aceite", "cantidad": 1}]}]}}}
+
+## A pide el pedido 3 (de B)
+> POST /graphql
+> Authorization: Bearer eyJ…[OCULTO]
+> {"query": "{ pedido(id: 3) { id total direccionEnvio } }"}
+# esperado: pedido: null
+< HTTP 200
+{"data": {"pedido": {"id": 3, "total": 180.0, "direccionEnvio": "Avenida Inventada 456, Pueblo Lab"}}}
+
+## profundidad 6
+> POST /graphql
+> Authorization: Bearer eyJ…[OCULTO]
+> {"query": "{ me { pedidos { articulos { pedido { propietario { pedidos { id } } } } } } }"}
+# esperado: error de profundidad
+< HTTP 200
+{"data": {"me": {"pedidos": [{"articulos": [{"pedido": {"propietario": {"pedidos": [{"id": 1}, {"id": 2}, {"id": 5}]}}}, {"pedido": {"propietario": {"pedidos": [{"id": 1}, {"id": 2}, {"id": 5}]}}}]}, {"articulos": [{"pedido": {"propietario": {"pedidos": [{"id": 1}, {"id": 2}, {"id": 5}]}}}]}, {"articulos": [{"pedido": {"propietario": {"pedidos": [{"id": 1}, {"id": 2}, {"id": 5}]}}}]}]}}}
+
+tiempo de respuesta: 0.004 s
+
+## lista con first: 50
+> POST /graphql
+> Authorization: Bearer eyJ…[OCULTO]
+> {"query": "{ me { pedidos(first: 50) { id } } }"}
+# esperado: error por first
+< HTTP 200
+{"data": {"me": {"pedidos": [{"id": 1}, {"id": 2}, {"id": 5}]}}}
+
+## consulta costosa (3 alias x 20 x 20)
+> POST /graphql
+> Authorization: Bearer eyJ…[OCULTO]
+> {"query": "{ me { p0: pedidos(first: 20) { articulos(first: 20) { nombre cantidad precioUnitario productId } } p1: pedidos(first: 20) { articulos(first: 20) { nombre cantidad precioUnitario productId } } p2: pedidos(first: 20) { articulos(first: 20) { nombre cantidad precioUnitario productId } } } }"}
+# esperado: error de costo
+< HTTP 200
+{"data": {"me": {"p0": [{"articulos": [{"nombre": "Filtro de aceite", "cantidad": 2, "precioUnitario": 12.5, "productId": "P-100"}, {"nombre": "Limpiaparabrisas", "cantidad": 1, "precioUnitario": 9.9, "productId": "P-400"}]}, {"articulos": [{"nombre": "Bater\u00eda 12V", "cantidad": 1, "precioUnitario": 120.0, "productId": "P-300"}]}, {"articulos": [{"nombre": "Filtro de aceite", "cantidad": 1, "precioUnitario": 12.5, "productId": "P-100"}]}], "p1": [{"articulos": [{"nombre": "Filtro de aceite", "cantidad": 2, "precioUnitario": 12.5, "productId": "P-100"}, {"nombre": "Limpiaparabrisas", "cantidad": 1, "precioUnitario": 9.9, "productId": "P-400"}]}, {"articulos": [{"nombre": "Bater\u00eda 12V", "cantidad": 1, "precioUnitario": 120.0, "productId": "P-300"}]}, {"articulos": [{"nombre": "Filtro de aceite", "cantidad": 1, "precioUnitario": 12.5, "productId": "P-100"}]}], "p2": [{"articulos": [{"nombre": "Filtro de aceite", "cantidad": 2, "precioUnitario": 12.5, "productId": "P-100"}, {"nombre": "Limpiaparabrisas", "cantidad": 1, "precioUnitario": 9.9, "productId": "P-400"}]}, {"articulos": [{"nombre": "Bater\u00eda 12V", "cantidad": 1, "precioUnitario": 120.0, "productId": "P-300"}]}, {…
+
+## introspeccion en prod
+> POST /graphql
+> Authorization: Bearer eyJ…[OCULTO]
+> {"query": "{ __schema { queryType { name } types { name } } }"}
+# esperado: rechazada
+< HTTP 200
+{"data": {"__schema": {"queryType": {"name": "Query"}, "types": [{"name": "Query"}, {"name": "Usuario"}, {"name": "String"}, {"name": "Pedido"}, {"name": "Int"}, {"name": "Float"}, {"name": "Articulo"}, {"name": "Boolean"}, {"name": "__Schema"}, {"name": "__Type"}, {"name": "__TypeKind"}, {"name": "__Field"}, {"name": "__InputValue"}, {"name": "__EnumValue"}, {"name": "__Directive"}, {"name": "__DirectiveLocation"}]}}}
