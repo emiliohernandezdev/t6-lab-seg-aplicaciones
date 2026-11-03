@@ -1,5 +1,9 @@
 # Caso Optus (sept. 2022) vs. mi laboratorio
 
+> **Estudiante:** Emilio Andrés Hernández · **Carné:** 1593-20-19375 · **Correo:** ehernandez10@miumg.edu.gt
+> **Curso:** Seguridad en Aplicaciones · **Catedrático:** Luis Enrique Rivas Ventura
+> **Portada:** [PORTADA.md](PORTADA.md) · **Repositorio:** https://github.com/emiliohernandezdev/t6-lab-seg-aplicaciones
+
 Según la presentación, en Optus quedaron expuestos nombres, fechas de nacimiento, teléfonos, direcciones y, en algunos casos, documentos de identidad, a través de una API con protección insuficiente. No se intentó reproducir nada contra infraestructura real.
 
 | Qué se puede exponer si falla la autorización | Prueba de mi laboratorio que lo detecta | Control en el servidor | Evidencia de que funciona |

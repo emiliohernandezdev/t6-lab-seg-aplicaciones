@@ -1,4 +1,8 @@
-# T6 – Auditoría y endurecimiento de APIs y microservicios
+# TAREA #6 – Auditoría y Endurecimiento de APIs y microservicios
+
+> **Estudiante:** Emilio Andrés Hernández · **Carné:** 1593-20-19375 · **Correo:** ehernandez10@miumg.edu.gt
+> **Curso:** Seguridad en Aplicaciones · **Catedrático:** Luis Enrique Rivas Ventura
+> **Portada:** [PORTADA.md](PORTADA.md) · **Repositorio:** https://github.com/emiliohernandezdev/t6-lab-seg-aplicaciones
 
 Laboratorio local con dos partes:
 

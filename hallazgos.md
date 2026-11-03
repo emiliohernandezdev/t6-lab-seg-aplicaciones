@@ -1,5 +1,9 @@
 # Hallazgos
 
+> **Estudiante:** Emilio Andrés Hernández · **Carné:** 1593-20-19375 · **Correo:** ehernandez10@miumg.edu.gt
+> **Curso:** Seguridad en Aplicaciones · **Catedrático:** Luis Enrique Rivas Ventura
+> **Portada:** [PORTADA.md](PORTADA.md) · **Repositorio:** https://github.com/emiliohernandezdev/t6-lab-seg-aplicaciones
+
 Inventario de endpoints de crAPI: [evidencias/crAPI/inventario_endpoints.md](evidencias/crAPI/inventario_endpoints.md)
 
 ## Bloque A – crAPI
